@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# dev logs / scratch
+*.log
+wand-duel-qr.png
