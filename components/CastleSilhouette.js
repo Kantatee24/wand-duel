@@ -10,7 +10,7 @@ const TOWERS = [
   { h: 68, w: 28 },
 ];
 
-export default function CastleSilhouette({ tint = colors.vignette, style }) {
+export default function CastleSilhouette({ tint = colors.border, style }) {
   return (
     <View style={[styles.wrap, style]} pointerEvents="none">
       <View style={styles.row}>

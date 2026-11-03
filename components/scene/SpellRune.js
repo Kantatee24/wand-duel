@@ -18,11 +18,11 @@ function Rune({ color, spinning }) {
 }
 
 // สัญลักษณ์เวท 3D ที่หมุนเร็วขึ้นตอนผู้เล่นลากคาถา และเปลี่ยนสีตามคาถาปัจจุบัน
-export default function SpellRune({ color = '#cf9f3f', size = 84, spinning = false }) {
+export default function SpellRune({ color = '#39ff6e', size = 84, spinning = false }) {
   return (
     <Canvas style={{ width: size, height: size }} camera={{ position: [0, 0, 2.6], fov: 45 }}>
-      <ambientLight intensity={0.6} />
-      <pointLight position={[2, 2, 2]} intensity={1.2} color="#ffdca0" />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[2, 2, 2]} intensity={1.3} color="#baffd8" />
       <pointLight position={[-2, -1, 1]} intensity={0.7} color={color} />
       <Rune color={color} spinning={spinning} />
     </Canvas>

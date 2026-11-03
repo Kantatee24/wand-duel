@@ -1,40 +1,42 @@
-// ธีม "สถาบันเวทมนตร์โบราณ" — กระดาษ parchment เก่า, หมึกน้ำตาล, กรอบทองเดินเส้น
-// (สี/เลย์เอาต์ออกแบบเอง — ชื่อคาถา Incendio/Stupefy/Protego อ้างอิงจาก Harry Potter
+// ธีม "ลอร์ดเวทมนตร์มืด" — ความมืดดุจราตรี, สายฟ้า/แสงสีเขียวมรกตของอวาดาเคดาฟรา, กรอบเรืองแสง
+// (สี/เลย์เอาต์ออกแบบเอง — ชื่อคาถา Incendio/Stupefy/Protego/Avada Kedavra อ้างอิงจาก Harry Potter
 // ใช้เฉพาะงานส่งอาจารย์รายวิชาเดียว ไม่เผยแพร่สาธารณะ/App Store)
 export const colors = {
-  bgTop: '#ead9b0',
-  bgMid: '#dcc48c',
-  bgBottom: '#b99a68',
-  vignette: '#6b4a2a',
+  bgTop: '#102417',
+  bgMid: '#07140d',
+  bgBottom: '#000000',
+  vignette: '#000000',
 
-  parchment: '#f3e6c4',
-  parchmentDark: '#e4d2a3',
+  parchment: 'rgba(12,26,18,0.92)',
+  parchmentDark: 'rgba(5,12,8,0.94)',
 
-  ink: '#3b2a1a',
-  inkMuted: '#6b5338',
-  inkFaint: '#8a7256',
+  ink: '#e8ffe9',
+  inkMuted: '#7fbd92',
+  inkFaint: '#466b52',
 
-  border: '#6b4423',
-  borderLight: '#9c7039',
-  gold: '#a6790f',
-  goldLight: '#cf9f3f',
+  border: '#1f8a4c',
+  borderLight: '#39ff6e',
+  gold: '#39ff6e',
+  goldLight: '#9dffc2',
 
-  card: 'rgba(243,230,196,0.92)',
-  cardBorder: '#6b4423',
+  card: 'rgba(10,22,15,0.92)',
+  cardBorder: '#1f8a4c',
 
-  textPrimary: '#3b2a1a',
-  textMuted: '#6b5338',
+  textPrimary: '#e8ffe9',
+  textMuted: '#7fbd92',
 
-  spellFire: '#8a2d20', // Incendio — แดงอิฐ/ทอง
-  spellStorm: '#1f4e6b', // Stupefy — น้ำเงินเข้ม/บรอนซ์
-  spellWard: '#2f5a3d', // Protego — เขียวเข้ม/เงิน
+  spellFire: '#ff6a3d', // Incendio — ไฟส้มแดงลุกโชน
+  spellStorm: '#38bdf8', // Stupefy — สายฟ้าสีฟ้าเย็น
+  spellWard: '#2dd4a7', // Protego — โล่มรกต
+  avada: '#39ff6e', // Avada Kedavra — สายฟ้า/แสงสีเขียวมรณะของลอร์ดเวทมนตร์มืด
+  avadaGlow: '#baffd8',
 
-  hpHigh: '#3d7a4f',
-  hpMid: '#a6790f',
-  hpLow: '#8a2d20',
+  hpHigh: '#39ff6e',
+  hpMid: '#facc15',
+  hpLow: '#ff3b3b',
 
-  danger: '#8a2d20',
-  success: '#3d7a4f',
+  danger: '#ff3b3b',
+  success: '#39ff6e',
 };
 
 export const fonts = {
@@ -49,6 +51,7 @@ export const spellColors = {
   fireball: colors.spellFire,
   lightning: colors.spellStorm,
   shield: colors.spellWard,
+  avada: colors.avada,
   fizzle: colors.inkFaint,
 };
 
@@ -56,7 +59,8 @@ export const spellLabels = {
   fireball: 'Incendio 🔥',
   lightning: 'Stupefy ⚡',
   shield: 'Protego 🛡️',
-  fizzle: 'มนตร์เพี้ยน 💨',
+  avada: 'Avada Kedavra ☠️',
+  fizzle: 'Fizzle 💨',
 };
 
 export function hpColor(hp) {
@@ -64,3 +68,44 @@ export function hpColor(hp) {
   if (hp > 25) return colors.hpMid;
   return colors.hpLow;
 }
+
+// บ้านทั้ง 4 แห่งฮอกวอตส์ — เลือกก่อนเข้าเกม (logo: ใส่ require('../assets/images/house-xxx.png')
+// ทีหลังได้เลย ถ้าไม่มีภาพจะโชว์ตราสัญลักษณ์อิโมจิ + สีประจำบ้านแทน)
+export const houses = {
+  gryffindor: {
+    key: 'gryffindor',
+    name: 'Gryffindor',
+    tagline: 'Brave and unyielding',
+    symbol: '🦁',
+    primary: '#ae0001',
+    secondary: '#eeba30',
+    logo: null,
+  },
+  slytherin: {
+    key: 'slytherin',
+    name: 'Slytherin',
+    tagline: 'Ambitious and cunning',
+    symbol: '🐍',
+    primary: '#2a623d',
+    secondary: '#aaaaaa',
+    logo: null,
+  },
+  ravenclaw: {
+    key: 'ravenclaw',
+    name: 'Ravenclaw',
+    tagline: 'Wise and witty',
+    symbol: '🦅',
+    primary: '#222f5b',
+    secondary: '#946b2d',
+    logo: null,
+  },
+  hufflepuff: {
+    key: 'hufflepuff',
+    name: 'Hufflepuff',
+    tagline: 'Just and loyal',
+    symbol: '🦡',
+    primary: '#ecb939',
+    secondary: '#372e29',
+    logo: null,
+  },
+};

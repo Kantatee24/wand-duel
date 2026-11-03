@@ -44,7 +44,7 @@ export function guideTemplate(type, size) {
   const h = height * 0.32;
 
   if (type === 'fireball') {
-    // กระดกโทรศัพท์ขึ้นข้างบน — เส้นแนวตั้งจากล่างขึ้นบน
+    // กระดกโทรศัพท์ขึ้นข้างบนเร็วๆ — เส้นเป็นแค่ตัวช่วยแนะแนวคร่าวๆ ไม่เน้นทิศทางที่ต้องแม่นเป๊ะ
     return [{ x: cx, y: cy + h }, { x: cx, y: cy - h }];
   }
   if (type === 'lightning') {
@@ -126,12 +126,14 @@ export function classifyStroke(rawPoints, boardSize) {
 
   // โล่ = แกว่งเป็นส่วนโค้งราวครึ่งวงกลม (~180°) ไม่ต้องหมุนจนครบรอบและไม่ต้องกลับมาจุดเดิม
   const sweepDeg = Math.abs(netRotationDeg);
+  const sweepTooFull = sweepDeg > 110 && sweepDeg < 280;
   let type = 'fizzle';
-  if (sweepDeg > 110 && sweepDeg < 280 && roundness > 0.45 && directionChanges <= 1) {
+  if (sweepTooFull && roundness > 0.45 && directionChanges <= 1) {
     type = 'shield';
   } else if (directionChanges >= 2 && straightness < 0.75) {
     type = 'lightning';
-  } else if (straightness > 0.78 && spanRatio > 0.35) {
+  } else if (spanRatio > 0.2) {
+    // Incendio = สะบัดเร็วๆ ตัวใหญ่พอ ไม่ต้องตรงทิศทาง แค่ไม่เข้าเงื่อนไขโล่/สายฟ้าก็ถือว่าใช่แล้ว
     type = 'fireball';
   }
 
@@ -152,9 +154,10 @@ function scoreForType(type, m) {
     return Math.round(((changeScore + straightPenalty) / 2) * 100);
   }
   if (type === 'fireball') {
-    const straightScore = clamp01((m.straightness - 0.6) / 0.4);
-    const spanScore = clamp01(m.spanRatio);
-    return Math.round(((straightScore + spanScore) / 2) * 100);
+    // ไม่เน้นทิศทาง — ให้คะแนนตามขนาดการสะบัด (ใหญ่พอ) + ความนิ่ง (ไม่สั่นสะบัดจนสั่นเป็นซิกแซก)
+    const spanScore = clamp01(m.spanRatio / 0.5);
+    const steadyScore = clamp01(1 - m.directionChanges / 3);
+    return Math.round(((spanScore + steadyScore) / 2) * 100);
   }
   return 0;
 }

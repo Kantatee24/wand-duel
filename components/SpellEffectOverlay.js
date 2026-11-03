@@ -3,6 +3,7 @@ import { spellColors } from '../theme';
 import FireBurst from './effects/FireBurst';
 import LightningBolt from './effects/LightningBolt';
 import ShieldBarrier from './effects/ShieldBarrier';
+import AvadaCurseEffect from './effects/AvadaCurseEffect';
 
 // เอฟเฟกต์เต็มจอตอนร่ายคาถาติด — effect: { type: 'fireball'|'lightning'|'shield', id: number }
 export default function SpellEffectOverlay({ effect }) {
@@ -25,6 +26,10 @@ export default function SpellEffectOverlay({ effect }) {
 
   if (effect.type === 'shield') {
     return <ShieldBarrier color={color} triggerId={effect.id} />;
+  }
+
+  if (effect.type === 'avada') {
+    return <AvadaCurseEffect triggerId={effect.id} />;
   }
 
   return null;

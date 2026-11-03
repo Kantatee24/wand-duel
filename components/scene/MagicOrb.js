@@ -12,7 +12,7 @@ function Orb() {
   return (
     <mesh ref={ref}>
       <icosahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial color="#cf9f3f" emissive="#6b4a12" roughness={0.3} metalness={0.6} />
+      <meshStandardMaterial color="#39ff6e" emissive="#0f3d22" roughness={0.3} metalness={0.6} />
     </mesh>
   );
 }
@@ -20,9 +20,9 @@ function Orb() {
 export default function MagicOrb({ size = 150 }) {
   return (
     <Canvas style={{ width: size, height: size }} camera={{ position: [0, 0, 3], fov: 45 }}>
-      <ambientLight intensity={0.7} />
-      <pointLight position={[2, 2, 2]} intensity={1.4} color="#ffdca0" />
-      <pointLight position={[-2, -1, 1]} intensity={0.5} color="#8a2d20" />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[2, 2, 2]} intensity={1.6} color="#baffd8" />
+      <pointLight position={[-2, -1, 1]} intensity={0.6} color="#39ff6e" />
       <Orb />
     </Canvas>
   );

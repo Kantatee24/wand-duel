@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Accelerometer, Gyroscope } from 'expo-sensors';
+import { Gyroscope } from 'expo-sensors';
 
 const SENSOR_INTERVAL_MS = 16; // ~60Hz
 const MAX_CAST_MS = 2200;
@@ -7,36 +7,26 @@ const MIN_CAST_DURATION_MS = 120; // ignore accidental taps shorter than this
 const GYRO_NOISE_THRESHOLD = 0.5; // rad/s - ignore hand jitter below this
 const ROTATION_DEG_FOR_SHIELD = 200; // a wide circular swing
 const MIN_DIRECTION_CHANGES_FOR_LIGHTNING = 2; // zig-zag flicks
-const MIN_ACCEL_SPIKE_FOR_FIREBALL = 0.9; // g, net of gravity - a forward thrust
+const ROTATION_DEG_FOR_FIREBALL = 35; // a single decisive flick (ไม่ต้องหมุนมากเท่าโล่ ไม่ต้องสลับทิศเหมือนสายฟ้า)
 
 // บันทึกการเคลื่อนไหวระหว่างที่ผู้เล่นกดค้าง แล้ววิเคราะห์ท่าร่ายคาถาตอนปล่อยนิ้ว
+// ใช้ไจโรอย่างเดียวทั้ง 3 ท่า (ไม่ใช้ accelerometer แล้ว เพราะแรงพุ่งจาก accel มี noise เยอะมาก
+// ต้องสะบัดแรงเกินจริงถึงจะติด Incendio — เหตุผลเดียวกับที่ useWandTrace.js เลิกใช้ accel ไปก่อนแล้ว)
 export function useSpellCast() {
   const [charging, setCharging] = useState(false);
-  const accelSamples = useRef([]);
   const gyroSamples = useRef([]);
-  const accelSub = useRef(null);
   const gyroSub = useRef(null);
   const startTime = useRef(0);
   const maxTimer = useRef(null);
 
   const stopSensors = useCallback(() => {
-    accelSub.current?.remove();
     gyroSub.current?.remove();
-    accelSub.current = null;
     gyroSub.current = null;
   }, []);
 
   const classify = useCallback(() => {
-    const accel = accelSamples.current;
     const gyro = gyroSamples.current;
     const duration = Date.now() - startTime.current;
-
-    let peakNetAccel = 0;
-    for (const s of accel) {
-      const mag = Math.sqrt(s.x * s.x + s.y * s.y + s.z * s.z);
-      const net = Math.abs(mag - 1);
-      if (net > peakNetAccel) peakNetAccel = net;
-    }
 
     let totalRotationRad = 0;
     const axisAbsSum = { x: 0, y: 0, z: 0 };
@@ -78,25 +68,20 @@ export function useSpellCast() {
       type = 'shield';
     } else if (directionChanges >= MIN_DIRECTION_CHANGES_FOR_LIGHTNING) {
       type = 'lightning';
-    } else if (peakNetAccel > MIN_ACCEL_SPIKE_FOR_FIREBALL) {
+    } else if (totalRotationDeg > ROTATION_DEG_FOR_FIREBALL) {
       type = 'fireball';
     }
 
-    return { type, peakNetAccel, totalRotationDeg, directionChanges, duration, dominantAxis };
+    return { type, totalRotationDeg, directionChanges, duration, dominantAxis };
   }, []);
 
   const startCast = useCallback(() => {
-    accelSamples.current = [];
     gyroSamples.current = [];
     startTime.current = Date.now();
     setCharging(true);
 
-    Accelerometer.setUpdateInterval(SENSOR_INTERVAL_MS);
     Gyroscope.setUpdateInterval(SENSOR_INTERVAL_MS);
 
-    accelSub.current = Accelerometer.addListener((data) => {
-      accelSamples.current.push({ ...data, t: Date.now() });
-    });
     gyroSub.current = Gyroscope.addListener((data) => {
       gyroSamples.current.push({ ...data, t: Date.now() });
     });
@@ -111,7 +96,7 @@ export function useSpellCast() {
     clearTimeout(maxTimer.current);
     stopSensors();
     setCharging(false);
-    if (accelSamples.current.length < 2) {
+    if (gyroSamples.current.length < 2) {
       return { type: 'fizzle', tooShort: true };
     }
     return classify();

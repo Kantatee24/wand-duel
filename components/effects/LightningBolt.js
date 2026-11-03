@@ -21,8 +21,8 @@ function boltPath(seed) {
   return d;
 }
 
-// ฟ้าผ่าซิกแซกจริงเป็นเส้นหยัก พร้อม glow ด้านหลัง ตอนร่าย Stupefy
-export default function LightningBolt({ seed, delay = 0, style }) {
+// ฟ้าผ่าซิกแซกจริงเป็นเส้นหยัก พร้อม glow ด้านหลัง ตอนร่าย Stupefy (หรือ Avada Kedavra ถ้าเปลี่ยนสี)
+export default function LightningBolt({ seed, delay = 0, style, color = '#eaf4ff', glowColor = '#bcd9ff', strokeWidth = 4 }) {
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -41,8 +41,8 @@ export default function LightningBolt({ seed, delay = 0, style }) {
   return (
     <Animated.View pointerEvents="none" style={[styles.wrap, { opacity }, style]}>
       <Svg width={WIDTH} height={HEIGHT}>
-        <Path d={d} stroke="#bcd9ff" strokeWidth={12} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.35} />
-        <Path d={d} stroke="#eaf4ff" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <Path d={d} stroke={glowColor} strokeWidth={strokeWidth * 3} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.35} />
+        <Path d={d} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </Svg>
     </Animated.View>
   );

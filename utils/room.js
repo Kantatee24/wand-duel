@@ -7,12 +7,14 @@ const ROOT = 'wandDuelRooms';
 // (fireball ~13/0.9s ≈14.4 dps, lightning ~20/1.5s ≈13.3 dps) ไม่มีท่าไหนเด่นจนสแปมแล้วชนะทันที
 const SPELL_DAMAGE = { fireball: 13, lightning: 20 };
 const SHIELD_DAMAGE_KEPT = 0.5; // shield blocks 50% of incoming damage
-const SHIELD_DURATION_MS = 3500;
+const SHIELD_DURATION_MS = 5000;
 const SHIELD_HEAL = 5;
+const AVADA_DAMAGE = 45; // คำสาปมรณะ — ดาเมจหนักเป็นพิเศษ และเจาะโล่ (ไม่มีวิธีป้องกันตามต้นฉบับ)
 
-function initialPlayer(name) {
+function initialPlayer(name, house = null) {
   return {
     name,
+    house,
     ready: false,
     connected: true,
     hp: 100,
@@ -20,6 +22,7 @@ function initialPlayer(name) {
     shieldExpiresAt: 0,
     lastSpell: null,
     lastSpellAt: 0,
+    avadaUsed: false,
   };
 }
 
@@ -27,7 +30,7 @@ export function generateRoomCode() {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 
-export async function createRoom(name) {
+export async function createRoom(name, house = null) {
   for (let attempt = 0; attempt < 6; attempt++) {
     const code = generateRoomCode();
     const roomRef = ref(db, `${ROOT}/${code}`);
@@ -38,7 +41,7 @@ export async function createRoom(name) {
         status: 'waiting',
         winner: null,
         round: 1,
-        players: { player1: initialPlayer(name) },
+        players: { player1: initialPlayer(name, house) },
       };
     });
     if (result.committed) {
@@ -46,16 +49,16 @@ export async function createRoom(name) {
       return { code, slot: 'player1' };
     }
   }
-  throw new Error('สร้างห้องไม่สำเร็จ ลองใหม่อีกครั้ง');
+  throw new Error('Failed to create room. Please try again');
 }
 
-export async function joinRoom(code, name) {
+export async function joinRoom(code, name, house = null) {
   const roomRef = ref(db, `${ROOT}/${code}`);
 
   // เช็คว่าห้องมีจริงด้วย get() ตรงๆ ก่อน (ให้ error "ไม่พบห้องนี้" ที่แม่นยำ)
   const existingSnap = await get(roomRef);
   if (!existingSnap.exists()) {
-    throw new Error('ไม่พบห้องนี้');
+    throw new Error('Room not found');
   }
 
   let failReason = null;
@@ -73,12 +76,12 @@ export async function joinRoom(code, name) {
     }
     return {
       ...current,
-      players: { ...current.players, player2: initialPlayer(name) },
+      players: { ...current.players, player2: initialPlayer(name, house) },
     };
   });
   if (!result.committed) {
-    if (failReason === 'FULL') throw new Error('ห้องนี้เต็มแล้ว');
-    throw new Error('เข้าห้องไม่สำเร็จ ลองใหม่อีกครั้ง');
+    if (failReason === 'FULL') throw new Error('This room is full');
+    throw new Error('Failed to join room. Please try again');
   }
   onDisconnect(ref(db, `${ROOT}/${code}/players/player2/connected`)).set(false);
   return 'player2';
@@ -124,6 +127,14 @@ export async function castSpell(code, casterSlot, spellType) {
       caster.shieldActive = true;
       caster.shieldExpiresAt = now + SHIELD_DURATION_MS;
       caster.hp = Math.min(100, caster.hp + SHIELD_HEAL);
+    } else if (spellType === 'avada') {
+      // คำสาปสังหาร — ครั้งเดียวต่อเกมการต่อสู้ และเจาะโล่ตรงตามต้นฉบับ (ไม่มีทางป้องกัน)
+      caster.avadaUsed = true;
+      target.hp = Math.max(0, target.hp - AVADA_DAMAGE);
+      if (target.hp <= 0) {
+        room.status = 'finished';
+        room.winner = casterSlot;
+      }
     } else {
       let damage = SPELL_DAMAGE[spellType] ?? 0;
       if (target.shieldActive && target.shieldExpiresAt > now) {
@@ -141,6 +152,11 @@ export async function castSpell(code, casterSlot, spellType) {
   });
 }
 
+// คอมโบอวาดาเคดาฟราพลาด (ร่ายไม่ติดต่อกันครบ 3 ท่า) — เสียโอกาสครั้งเดียวต่อเกมไปเลย ไม่เกิดดาเมจ
+export async function markAvadaUsed(code, slot) {
+  await update(ref(db, `${ROOT}/${code}/players/${slot}`), { avadaUsed: true });
+}
+
 export async function rematch(code) {
   await runTransaction(ref(db, `${ROOT}/${code}`), (room) => {
     if (!room) return undefined;
@@ -155,6 +171,7 @@ export async function rematch(code) {
         room.players[slot].shieldExpiresAt = 0;
         room.players[slot].lastSpell = null;
         room.players[slot].lastSpellAt = 0;
+        room.players[slot].avadaUsed = false;
       }
     }
     return room;

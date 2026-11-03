@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import GlowButton from '../components/GlowButton';
 import ParchmentPanel from '../components/ParchmentPanel';
 import CastleSilhouette from '../components/CastleSilhouette';
+import { HouseTag } from '../components/HouseBadge';
 import { playSfx } from '../utils/sound';
 import { colors, fonts } from '../theme';
 
@@ -31,7 +32,7 @@ export default function LobbyScreen({ room, roomCode, mySlot, onReady, onLeave, 
   if (countingDown) {
     return (
       <LinearGradient colors={[colors.bgTop, colors.bgMid, colors.bgBottom]} style={styles.center}>
-        <Text style={styles.countdown}>{count > 0 ? count : 'ดวล!'}</Text>
+        <Text style={styles.countdown}>{count > 0 ? count : 'Duel!'}</Text>
       </LinearGradient>
     );
   }
@@ -39,22 +40,22 @@ export default function LobbyScreen({ room, roomCode, mySlot, onReady, onLeave, 
   return (
     <LinearGradient colors={[colors.bgTop, colors.bgMid, colors.bgBottom]} style={styles.flex}>
       <View style={styles.container}>
-        <Text style={styles.codeLabel}>รหัสตราผนึก</Text>
+        <Text style={styles.codeLabel}>Seal Code</Text>
         <Text style={styles.code}>{roomCode}</Text>
 
         <ParchmentPanel style={{ width: '100%' }}>
-          <PlayerRow label="คุณ" player={me} highlight />
+          <PlayerRow label="You" player={me} highlight />
           <View style={styles.vs}>
             <Text style={styles.vsText}>VS</Text>
           </View>
-          <PlayerRow label="คู่ปรับ" player={opp} waiting={!opp} />
+          <PlayerRow label="Opponent" player={opp} waiting={!opp} />
         </ParchmentPanel>
 
-        {!opp && <Text style={styles.hint}>รอผู้เล่นอีกคนกรอกรหัสห้องเข้ามา…</Text>}
+        {!opp && <Text style={styles.hint}>Waiting for another player to enter the room code…</Text>}
 
         <View style={{ marginTop: 28, gap: 12, width: '100%' }}>
           <GlowButton
-            title={me?.ready ? '✓ พร้อมแล้ว' : 'พร้อมดวล!'}
+            title={me?.ready ? '✓ Ready!' : 'Ready to Duel!'}
             color={colors.spellFire}
             disabled={!opp || me?.ready}
             onPress={() => {
@@ -62,7 +63,7 @@ export default function LobbyScreen({ room, roomCode, mySlot, onReady, onLeave, 
               onReady();
             }}
           />
-          <GlowButton title="ออกจากห้อง" outline color={colors.inkMuted} onPress={onLeave} />
+          <GlowButton title="Leave Room" outline color={colors.inkMuted} onPress={onLeave} />
         </View>
       </View>
       <CastleSilhouette />
@@ -74,10 +75,13 @@ function PlayerRow({ label, player, waiting, highlight }) {
   return (
     <View style={styles.playerRow}>
       <Text style={[styles.playerLabel, highlight && { color: colors.spellFire }]}>{label}</Text>
-      <Text style={styles.playerName}>{waiting ? '…' : player?.name}</Text>
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={styles.playerName}>{waiting ? '…' : player?.name}</Text>
+        {!waiting && player?.house && <HouseTag houseKey={player.house} />}
+      </View>
       {!waiting && (
         <Text style={[styles.readyTag, player?.ready && styles.readyTagOn]}>
-          {player?.ready ? 'พร้อม' : 'รอ'}
+          {player?.ready ? 'Ready' : 'Waiting'}
         </Text>
       )}
     </View>

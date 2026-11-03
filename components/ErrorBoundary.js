@@ -24,9 +24,9 @@ export default class ErrorBoundary extends Component {
       return (
         <LinearGradient colors={[colors.bgTop, colors.bgMid, colors.bgBottom]} style={styles.flex}>
           <View style={styles.container}>
-            <Text style={styles.title}>มีบางอย่างผิดพลาด</Text>
+            <Text style={styles.title}>Something went wrong</Text>
             <Text style={styles.message}>{String(this.state.error?.message ?? this.state.error)}</Text>
-            <GlowButton title="ลองใหม่อีกครั้ง" color={colors.gold} onPress={this.reset} />
+            <GlowButton title="Try Again" color={colors.gold} onPress={this.reset} />
           </View>
         </LinearGradient>
       );

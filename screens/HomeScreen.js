@@ -4,6 +4,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,10 +15,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import GlowButton from '../components/GlowButton';
 import ParchmentPanel from '../components/ParchmentPanel';
 import MagicOrb from '../components/scene/MagicOrb';
+import { HouseTag } from '../components/HouseBadge';
 import { playSfx } from '../utils/sound';
 import { colors, fonts } from '../theme';
 
-export default function HomeScreen({ onCreate, onJoin, onPractice, busy, error }) {
+export default function HomeScreen({ onCreate, onJoin, onPractice, house, onChangeHouse, busy, error }) {
   const [name, setName] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [mode, setMode] = useState(null); // null | 'join'
@@ -42,10 +44,17 @@ export default function HomeScreen({ onCreate, onJoin, onPractice, busy, error }
             <MagicOrb size={110} />
           </View>
           <Text style={styles.title}>Wand Duel</Text>
-          <Text style={styles.subtitle}>สะบัดไม้กายสิทธิ์ ร่ายคาถาใส่คู่ปรับของเธอ</Text>
+          <Text style={styles.subtitle}>Flick your wand and cast spells at your rival</Text>
+
+          {house && (
+            <Pressable onPress={onChangeHouse} style={styles.houseRow}>
+              <HouseTag houseKey={house} />
+              <Text style={styles.houseChange}>Change House</Text>
+            </Pressable>
+          )}
 
           <ParchmentPanel>
-            <Text style={styles.label}>นามของนักเวท</Text>
+            <Text style={styles.label}>Wizard's Name</Text>
             <TextInput
               value={name}
               onChangeText={setName}
@@ -57,7 +66,7 @@ export default function HomeScreen({ onCreate, onJoin, onPractice, busy, error }
 
             {mode === 'join' && (
               <>
-                <Text style={[styles.label, { marginTop: 14 }]}>รหัสตราผนึก (4 หลัก)</Text>
+                <Text style={[styles.label, { marginTop: 14 }]}>Seal Code (4 digits)</Text>
                 <TextInput
                   value={joinCode}
                   onChangeText={(t) => setJoinCode(t.replace(/[^0-9]/g, '').slice(0, 4))}
@@ -76,9 +85,9 @@ export default function HomeScreen({ onCreate, onJoin, onPractice, busy, error }
               <ActivityIndicator color={colors.gold} style={{ marginTop: 20 }} />
             ) : mode === 'join' ? (
               <View style={styles.row}>
-                <GlowButton title="ย้อนกลับ" outline color={colors.inkMuted} onPress={tap(() => setMode(null))} style={styles.flexBtn} />
+                <GlowButton title="Back" outline color={colors.inkMuted} onPress={tap(() => setMode(null))} style={styles.flexBtn} />
                 <GlowButton
-                  title="เข้าห้อง"
+                  title="Enter Room"
                   color={colors.spellStorm}
                   disabled={joinCode.length !== 4}
                   onPress={tap(() => onJoin(effectiveName, joinCode))}
@@ -87,14 +96,14 @@ export default function HomeScreen({ onCreate, onJoin, onPractice, busy, error }
               </View>
             ) : (
               <View style={{ marginTop: 20, gap: 12 }}>
-                <GlowButton title="⚔ เปิดห้องดวล" color={colors.spellFire} onPress={tap(() => onCreate(effectiveName))} />
-                <GlowButton title="เข้าร่วมห้อง" outline color={colors.spellStorm} onPress={tap(() => setMode('join'))} />
-                <GlowButton title="🕯 ฝึกซ้อมท่าคนเดียว" outline color={colors.spellWard} onPress={tap(onPractice)} />
+                <GlowButton title="⚔ Open Duel Room" color={colors.spellFire} onPress={tap(() => onCreate(effectiveName))} />
+                <GlowButton title="Join a Room" outline color={colors.spellStorm} onPress={tap(() => setMode('join'))} />
+                <GlowButton title="🕯 Practice Solo" outline color={colors.spellWard} onPress={tap(onPractice)} />
               </View>
             )}
           </ParchmentPanel>
 
-          <Text style={styles.hint}>ต้องใช้ 2 เครื่อง — คนหนึ่งเปิดห้อง อีกคนกรอกรหัสเข้าร่วม</Text>
+          <Text style={styles.hint}>Requires 2 devices — one opens a room, the other enters the code to join</Text>
 
           <Image source={require('../assets/images/castle.png')} style={styles.castle} resizeMode="contain" />
         </ScrollView>
@@ -135,6 +144,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display,
   },
   subtitle: { color: colors.inkMuted, textAlign: 'center', marginTop: 4, marginBottom: 24, fontFamily: fonts.serifItalic, fontSize: 15 },
+  houseRow: { flexDirection: 'row', alignItems: 'center', gap: 10, alignSelf: 'center', marginBottom: 16 },
+  houseChange: { color: colors.inkFaint, fontSize: 11, fontFamily: fonts.serifItalic, textDecorationLine: 'underline' },
   label: { color: colors.inkMuted, marginBottom: 6, fontFamily: fonts.serifBold },
   input: {
     borderWidth: 1.5,
@@ -145,7 +156,7 @@ const styles = StyleSheet.create({
     color: colors.ink,
     fontSize: 16,
     fontFamily: fonts.serif,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.25)',
   },
   row: { flexDirection: 'row', gap: 12, marginTop: 20 },
   flexBtn: { flex: 1 },

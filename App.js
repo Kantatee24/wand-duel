@@ -11,6 +11,7 @@ import {
 } from '@expo-google-fonts/eb-garamond';
 
 import HomeScreen from './screens/HomeScreen';
+import HouseSelectScreen from './screens/HouseSelectScreen';
 import LobbyScreen from './screens/LobbyScreen';
 import BattleScreen from './screens/BattleScreen';
 import GameOverScreen from './screens/GameOverScreen';
@@ -27,6 +28,7 @@ export default function App() {
     EBGaramond_500Medium_Italic,
   });
 
+  const [house, setHouse] = useState(null);
   const [roomCode, setRoomCode] = useState(null);
   const [mySlot, setMySlot] = useState(null);
   const [room, setRoom] = useState(null);
@@ -54,7 +56,7 @@ export default function App() {
     setBusy(true);
     setError('');
     try {
-      const { code, slot } = await createRoom(name);
+      const { code, slot } = await createRoom(name, house);
       setRoomCode(code);
       setMySlot(slot);
     } catch (e) {
@@ -68,7 +70,7 @@ export default function App() {
     setBusy(true);
     setError('');
     try {
-      const slot = await joinRoom(code, name);
+      const slot = await joinRoom(code, name, house);
       setRoomCode(code);
       setMySlot(slot);
     } catch (e) {
@@ -87,8 +89,17 @@ export default function App() {
     return (
       <LinearGradient colors={[colors.bgTop, colors.bgBottom]} style={styles.loading}>
         <ActivityIndicator color={colors.gold} size="large" />
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </LinearGradient>
+    );
+  }
+
+  if (!house) {
+    return (
+      <>
+        <HouseSelectScreen onSelect={setHouse} />
+        <StatusBar style="light" />
+      </>
     );
   }
 
@@ -96,7 +107,7 @@ export default function App() {
     return (
       <>
         <PracticeScreen onExit={() => setPracticeMode(false)} />
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </>
     );
   }
@@ -108,10 +119,12 @@ export default function App() {
           onCreate={handleCreate}
           onJoin={handleJoin}
           onPractice={() => setPracticeMode(true)}
+          house={house}
+          onChangeHouse={() => setHouse(null)}
           busy={busy}
           error={error}
         />
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </>
     );
   }
@@ -120,7 +133,7 @@ export default function App() {
     return (
       <LinearGradient colors={[colors.bgTop, colors.bgBottom]} style={styles.loading}>
         <ActivityIndicator color={colors.gold} size="large" />
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </LinearGradient>
     );
   }
@@ -154,7 +167,7 @@ export default function App() {
   return (
     <>
       {screen}
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </>
   );
 }

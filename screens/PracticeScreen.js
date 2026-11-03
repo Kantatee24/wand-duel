@@ -18,9 +18,9 @@ const TARGETS = ['fireball', 'lightning', 'shield'];
 const PASS_SCORE = 55;
 
 const INSTRUCTIONS = {
-  fireball: 'กดค้างแล้วกระดกโทรศัพท์ขึ้นข้างบนเร็วๆ แรงๆ',
-  lightning: 'กดค้างแล้วสะบัดข้อมือซิกแซกซ้าย-ขวาเร็วๆ',
-  shield: 'กดค้างแล้วแกว่งโทรศัพท์เป็นครึ่งวงกลม (ซ้าย-บน-ขวา)',
+  fireball: 'Press and hold, then flick your phone up fast and hard (direction doesn\'t need to be exact)',
+  lightning: 'Press and hold, then flick your wrist zigzag left-right quickly',
+  shield: 'Press and hold, then swing your phone in a half-circle (left-up-right)',
 };
 
 function pickNextTarget(current) {
@@ -110,9 +110,9 @@ export default function PracticeScreen({ onExit }) {
       <SpellEffectOverlay effect={effect} />
       <View style={styles.container}>
         <View style={styles.statsRow}>
-          <Stat label="สตรีค" value={streak} />
-          <Stat label="สูงสุด" value={best} />
-          <Stat label="แม่นยำ" value={`${accuracy}%`} />
+          <Stat label="Streak" value={streak} />
+          <Stat label="Best" value={best} />
+          <Stat label="Accuracy" value={`${accuracy}%`} />
         </View>
 
         <View style={styles.headRow}>
@@ -121,7 +121,7 @@ export default function PracticeScreen({ onExit }) {
         </View>
 
         <ParchmentPanel contentStyle={{ alignItems: 'center', paddingVertical: 12 }} style={{ borderColor: spellColors[target] }}>
-          <Text style={styles.targetLabel}>ลองร่าย</Text>
+          <Text style={styles.targetLabel}>Try Casting</Text>
           <Text style={[styles.targetSpell, { color: spellColors[target] }]}>{spellLabels[target]}</Text>
           <Text style={styles.targetInstruction}>{INSTRUCTIONS[target]}</Text>
         </ParchmentPanel>
@@ -152,23 +152,23 @@ export default function PracticeScreen({ onExit }) {
             <>
               <Text style={[styles.feedbackTitle, { color: lastResult.isCorrect ? colors.hpHigh : colors.danger }]}>
                 {lastResult.type === 'fizzle'
-                  ? '✗ มนตร์เพี้ยน — สะบัดสั้นหรือรูปทรงไม่ชัด'
+                  ? '✗ Spell fizzled — flick too short or shape unclear'
                   : lastResult.isCorrect
-                    ? `✓ ถูกต้อง! (${lastResult.score}%)`
-                    : `✗ ได้ ${spellLabels[lastResult.type] ?? lastResult.type} แทน (${lastResult.score}%)`}
+                    ? `✓ Correct! (${lastResult.score}%)`
+                    : `✗ Got ${spellLabels[lastResult.type] ?? lastResult.type} instead (${lastResult.score}%)`}
               </Text>
               {lastResult.metrics && (
                 <Text style={styles.debugText}>
-                  ความตรง {Math.round((lastResult.metrics.straightness ?? 0) * 100)}% · หมุน {Math.round(Math.abs(lastResult.metrics.netRotationDeg ?? 0))}° · สะบัด {lastResult.metrics.directionChanges ?? 0} ครั้ง
+                  Straightness {Math.round((lastResult.metrics.straightness ?? 0) * 100)}% · Rotation {Math.round(Math.abs(lastResult.metrics.netRotationDeg ?? 0))}° · Flicks {lastResult.metrics.directionChanges ?? 0}
                 </Text>
               )}
             </>
           ) : (
-            <Text style={styles.wandHint}>{charging ? 'สะบัดตามเส้นประเลย!' : 'กดค้างแล้วสะบัดโทรศัพท์ตามเส้นประ'}</Text>
+            <Text style={styles.wandHint}>{charging ? 'Flick along the dotted line!' : 'Press and hold, then flick your phone along the dotted line'}</Text>
           )}
         </View>
 
-        <GlowButton title="กลับหน้าหลัก" outline color={colors.inkMuted} onPress={onExit} />
+        <GlowButton title="Back to Home" outline color={colors.inkMuted} onPress={onExit} />
       </View>
     </LinearGradient>
   );
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(166,121,15,0.12)',
+    backgroundColor: 'rgba(57,255,110,0.1)',
   },
   feedbackWrap: { alignItems: 'center', minHeight: 50, justifyContent: 'center' },
   feedbackTitle: { fontFamily: fonts.serifBold, fontSize: 16, textAlign: 'center' },

@@ -35,15 +35,15 @@ export default function GameOverScreen({ room, mySlot, onRematch, onExit }) {
           { color: won ? colors.hpHigh : colors.danger, transform: [{ scale }] },
         ]}
       >
-        {won ? 'ชัยชนะ' : 'ปราชัย'}
+        {won ? 'Victory' : 'Defeat'}
       </Animated.Text>
       <Text style={styles.subtitle}>
-        {won ? 'คาถาของเธอทรงพลังที่สุดในสนามดวล' : 'ฝึกสะบัดไม้กายสิทธิ์แล้วมาดวลใหม่'}
+        {won ? 'Your spells reigned supreme in the duel' : 'Practice your wandwork and duel again'}
       </Text>
 
       <View style={{ marginTop: 36, gap: 12, width: '100%' }}>
-        <GlowButton title="⚔ ดวลใหม่อีกครั้ง" color={colors.spellFire} onPress={onRematch} />
-        <GlowButton title="กลับหน้าหลัก" outline color={colors.inkMuted} onPress={onExit} />
+        <GlowButton title="⚔ Duel Again" color={colors.spellFire} onPress={onRematch} />
+        <GlowButton title="Back to Home" outline color={colors.inkMuted} onPress={onExit} />
       </View>
 
       <CastleSilhouette style={styles.castle} />
